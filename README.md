@@ -1,1 +1,1 @@
-# elsbank-authoryzer-gateway
+# elsbank-authorizer-gateway
