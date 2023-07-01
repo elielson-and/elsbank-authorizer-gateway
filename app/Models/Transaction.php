@@ -10,4 +10,5 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = ['uuid','payer', 'payee', 'value'];
+    protected $hidden = ['id'];
 }
