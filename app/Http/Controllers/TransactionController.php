@@ -22,28 +22,23 @@ class TransactionController extends Controller
         $validator = Validator::make($request->all(), [
             'payer' => 'required',
             'payee' => 'required',
-            'value' => 'required'
+            'value' => 'required|gte:0.01'
         ]);
 
       
 
         if ($validator->fails()) {
-            return response()->json(['message' => 'failed to process, missing some parameter(s).'], 400);
+            return response()->json(['message' => 'failed to process, missing or invalid parameter(s).'], 400);
         }
         
         //TODO: join to one consult
-        $payer_balance = User::with('wallet')->where('uuid', $request->payer)->first()->wallet->balance;
-        $payee_balance = User::with('wallet')->where('uuid', $request->payee)->first()->wallet->balance;
-        return response()->json([
-            'payer_balance' => $payer_balance,
-            'payee_balance' => $payee_balance
-        ],200);
+        $payer_balance = floatVal(User::with('wallet')->where('uuid', $request->payer)->first()->wallet->balance);
+        $payee_balance = floatVal(User::with('wallet')->where('uuid', $request->payee)->first()->wallet->balance);
+       
+        if ($request->value > $payer_balance){
+            return response()->json(['message'=>"Can't process this transaction. Payer has no suficient founds"],401);
+        }
 
-        // $transaction = Transaction::create([
-        //     'uuid' => Str::uuid(),
-        //     'payer' => $request->payer,
-        //     'payee' => $request->payee,
-        //     'value' => $request->value
-        // ]);
+
     }
 }
